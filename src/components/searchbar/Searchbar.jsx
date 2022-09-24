@@ -21,17 +21,37 @@ const searchObj= {
     }
 
     const varToString = varObj => Object.keys({varObj})[0]
+    const checkInArray=({arr, search, current_path})=>{
+        for (let i = 0; i < arr.length; i++) {
+            const item = arr[i];
+            if (item==search){
+                return current_path+'['+i+'].'
+            }
+            if(Array.isArray(item)){
+                for (let j = 0; j < item.length; j++) {
+                    
+                }
 
+            }                
+        }
+        return null
+    }
     const checkInObj=({obj, search, current_path})=>{
         for (const key in obj) {
             if (Object.hasOwnProperty.call(obj, key)) {
                 const element = obj[key];
-                if(typeof arr === 'object' && arr !== null){
-                    
-                }
                 if(element==search){
                     return current_path+ varToString(element)
                 }
+                if(Array.isArray(element)){
+                    const isItThereReturnPath= checkInArray({obj:arr, search, current_path})
+                    return isItThereReturnPath
+                }
+                if(typeof arr === 'object' && arr !== null){
+                    checkInObj({obj:arr, search, current_path})
+                }
+
+
             }
         }
         return null
@@ -41,20 +61,13 @@ const searchObj= {
         let path_name=varToString(arr)+'.'
         if (typeof arr === 'object' && arr !== null){
             //an object
-            const isItThereReturnPath= checkInObj({obj:arr, search:inputMsg, current_path=path_name})
+            const isItThereReturnPath= checkInObj({obj:arr, search:inputMsg, current_path:path_name})
             if(isItThereReturnPath) return setFoundPath(isItThereReturnPath)
         }
         if (Array.isArray(arr)){
             //an array
-            for (let i = 0; i < arr.length; i++) {
-                const item = arr[i];
-                if (item==inputMsg){
-                    return setFoundPath(path_name)
-                }
-                if(Array.isArray(item)){
-                    const checkQuery= getSearchQueryPath()
-                }                
-            }
+            const isItThereReturnPath= checkInArray({arr, search:inputMsg, current_path:path_name})
+            if(isItThereReturnPath) return setFoundPath(isItThereReturnPath)
         }
     }
   return (
