@@ -29,7 +29,7 @@ const searchObj= {
             }
             if(Array.isArray(item)){
                 for (let j = 0; j < item.length; j++) {
-                    
+                    checkInArray({arr:item, search, })
                 }
 
             }                

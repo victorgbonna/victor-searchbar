@@ -1,4 +1,4 @@
-import PushNotificationLayout from "../components/PushNotificationLayout";
+
 import Searchbar from "../components/searchbar/Searchbar";
 // import styles from "../styles/Home.module.css";
 
