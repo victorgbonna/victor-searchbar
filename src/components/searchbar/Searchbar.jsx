@@ -7,7 +7,7 @@ export default function Searchbar() {
     const [inputMsg, setInputMsg]= useState('')
 const searchObj= {
        user: {
-         id: 1,
+         id: [1, 'James'],
          name: {
            firstName: "James",
            lastName: "Ibori"
@@ -20,9 +20,9 @@ const searchObj= {
        }
     }
 
-    const varToString = varObj => Object.keys({varObj})[0]
+    // const varToString = varObj => Object.keys({varObj})[0]
     const checkInArray=({arr, search, current_path})=>{
-        console.log("it is array")
+        console.log("it is array", {current_path})
         for (let i = 0; i < arr.length; i++) {
             const item = arr[i];
             if (item==search){
@@ -38,27 +38,31 @@ const searchObj= {
             }   
             if(typeof item === 'object' && item !== null && !Array.isArray(item)){
                 const isItThereReturnPath=checkInObj({obj:item, search,
-                    current_path: current_path+varToString(item)})
+                    current_path: current_path+'['+i+'].'})
                 if(isItThereReturnPath) return isItThereReturnPath
             } 
         }
         return null
     }
     const checkInObj=({obj, search, current_path})=>{
-        console.log('it is obj')
+        console.log('it is obj', {current_path})
         for (const key in obj) {
             if (Object.hasOwnProperty.call(obj, key)) {
                 const element = obj[key];
                 if(element==search){
-                    return current_path+ varToString(element)
+                    return current_path+ key
                 }
                 if(Array.isArray(element)){
-                    const isItThereReturnPath= checkInArray({obj:element, search, current_path: current_path+ varToString(element)})
-                    return isItThereReturnPath
+                    const isItThereReturnPath= checkInArray({arr:element, search, current_path: current_path+ key})
+                    if(isItThereReturnPath){
+                        return isItThereReturnPath
+                    }
                 }
-                if(typeof element === 'object' && element !== null && !Array.isArray(arr)){
-                    const isItThereReturnPath= checkInArray({obj:element, search, current_path: current_path+ varToString(element)})
-                    return isItThereReturnPath
+                if(typeof element === 'object' && element !== null && !Array.isArray(element)){
+                    const isItThereReturnPath= checkInObj({obj:element, search, current_path: current_path+ key+'.'})
+                    if(isItThereReturnPath){
+                        return isItThereReturnPath
+                    }
                 }
 
 
@@ -73,12 +77,12 @@ const searchObj= {
         if (typeof arr === 'object' && arr !== null && !Array.isArray(arr)){
             //an object
             const isItThereReturnPath= checkInObj({obj:arr, search:inputMsg, current_path:path_name+'.'})
-            if(isItThereReturnPath) return setFoundPath(isItThereReturnPath)
+            if(isItThereReturnPath) return setFoundPath(`the word ${inputMsg} is at ${isItThereReturnPath}`)
         }
         if (Array.isArray(arr)){
             //an array
             const isItThereReturnPath= checkInArray({arr, search:inputMsg, current_path:path_name})
-            if(isItThereReturnPath) return setFoundPath(isItThereReturnPath)
+            if(isItThereReturnPath) return setFoundPath(`the word ${inputMsg} is at ${isItThereReturnPath}`)
         }
         return setErrorObj('Nothing found')
     }
@@ -96,7 +100,7 @@ const searchObj= {
             if(e.key=="Enter"){
                 setFoundPath('');
                 setErrorObj('');
-                getSearchQueryPath({arr:['abc'],inputMsg})
+                getSearchQueryPath({arr:searchObj,inputMsg})
 
             }
         }}/>
@@ -104,7 +108,7 @@ const searchObj= {
                 setFoundPath('');
                 setErrorObj('');
                 getSearchQueryPath(
-                    {arr:['abc'],inputMsg})
+                    {arr:searchObj,inputMsg})
         }}
             width="21"
             height="21"
@@ -119,7 +123,7 @@ const searchObj= {
         </svg>
         </div>
         {(errorObj || foundPath) && 
-            <p style={errorObj?{color:"red"}:{color:"green"}}>{errorObj ||foundPath}</p>
+            <p style={errorObj?{color:"red"}:{color:"green"}}>{errorObj || foundPath}</p>
         }
 
     </div>
