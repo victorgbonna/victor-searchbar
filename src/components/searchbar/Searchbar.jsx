@@ -22,21 +22,30 @@ const searchObj= {
 
     const varToString = varObj => Object.keys({varObj})[0]
     const checkInArray=({arr, search, current_path})=>{
+        console.log("it is array")
         for (let i = 0; i < arr.length; i++) {
             const item = arr[i];
             if (item==search){
-                return current_path+'['+i+'].'
+                return current_path+'['+i+']'
             }
             if(Array.isArray(item)){
                 for (let j = 0; j < item.length; j++) {
-                    checkInArray({arr:item, search, })
-                }
+                    const isItThereReturnPath=checkInArray({arr:item, search, 
+                        current_path:current_path+'['+i+']'+'['+j+']'})
 
-            }                
+                    if(isItThereReturnPath) return isItThereReturnPath
+                }
+            }   
+            if(typeof item === 'object' && item !== null && !Array.isArray(item)){
+                const isItThereReturnPath=checkInObj({obj:item, search,
+                    current_path: current_path+varToString(item)})
+                if(isItThereReturnPath) return isItThereReturnPath
+            } 
         }
         return null
     }
     const checkInObj=({obj, search, current_path})=>{
+        console.log('it is obj')
         for (const key in obj) {
             if (Object.hasOwnProperty.call(obj, key)) {
                 const element = obj[key];
@@ -44,11 +53,12 @@ const searchObj= {
                     return current_path+ varToString(element)
                 }
                 if(Array.isArray(element)){
-                    const isItThereReturnPath= checkInArray({obj:arr, search, current_path})
+                    const isItThereReturnPath= checkInArray({obj:element, search, current_path: current_path+ varToString(element)})
                     return isItThereReturnPath
                 }
-                if(typeof arr === 'object' && arr !== null){
-                    checkInObj({obj:arr, search, current_path})
+                if(typeof element === 'object' && element !== null && !Array.isArray(arr)){
+                    const isItThereReturnPath= checkInArray({obj:element, search, current_path: current_path+ varToString(element)})
+                    return isItThereReturnPath
                 }
 
 
@@ -58,10 +68,11 @@ const searchObj= {
     }
 
     const getSearchQueryPath=({arr, inputMsg})=>{
-        let path_name=varToString(arr)+'.'
-        if (typeof arr === 'object' && arr !== null){
+        // let path_name=varToString(arr)
+        let path_name= 'variable'
+        if (typeof arr === 'object' && arr !== null && !Array.isArray(arr)){
             //an object
-            const isItThereReturnPath= checkInObj({obj:arr, search:inputMsg, current_path:path_name})
+            const isItThereReturnPath= checkInObj({obj:arr, search:inputMsg, current_path:path_name+'.'})
             if(isItThereReturnPath) return setFoundPath(isItThereReturnPath)
         }
         if (Array.isArray(arr)){
@@ -69,23 +80,32 @@ const searchObj= {
             const isItThereReturnPath= checkInArray({arr, search:inputMsg, current_path:path_name})
             if(isItThereReturnPath) return setFoundPath(isItThereReturnPath)
         }
+        return setErrorObj('Nothing found')
     }
   return (
     <div className={styles.tabdiv}>
         <h2>Press Enter or click the search button</h2>
         <div className={styles.tabinp}>
         <input type="text" placeholder="search..." onChange={(e)=> {
+            
             setInputMsg(e.target.value)
         }}
         value={inputMsg}
         onKeyDown={(e)=>{
             // console.log(e.key)
             if(e.key=="Enter"){
-                getSearchQueryPath({arr:searchObj,inputMsg})
+                setFoundPath('');
+                setErrorObj('');
+                getSearchQueryPath({arr:['abc'],inputMsg})
 
             }
         }}/>
-        <svg onClick={()=>getSearchQueryPath({arr:searchObj,inputMsg})}
+        <svg onClick={()=>{
+                setFoundPath('');
+                setErrorObj('');
+                getSearchQueryPath(
+                    {arr:['abc'],inputMsg})
+        }}
             width="21"
             height="21"
             viewBox="0 0 21 21"
