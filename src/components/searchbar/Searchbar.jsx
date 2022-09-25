@@ -5,40 +5,49 @@ export default function Searchbar() {
     const [errorObj, setErrorObj]= useState('')
     const [foundPath, setFoundPath]= useState('')
     const [inputMsg, setInputMsg]= useState('')
-const searchObj= {
-       user: {
-         id: [1, 'James'],
-         name: {
-           firstName: "James",
-           lastName: "Ibori"
-         },
-         location: {
-           city: "Ikoyi",
-           state: "Lagos",
-           address: "One expensive house like that"
-         }
-       }
-    }
+    const searchObj= {
+        user: {
+            id: [1, 'James'],
+            name: {
+            firstName: "James",
+            lastName: "Ibori"
+            },
+            location: {
+            city: "Ikoyi",
+            state: "Lagos",
+            address: "One expensive house like that"
+            }
+        }
+        }
 
     // const varToString = varObj => Object.keys({varObj})[0]
     const checkInArray=({arr, search, current_path})=>{
         console.log("it is array", {current_path})
+
+        //loop through array
         for (let i = 0; i < arr.length; i++) {
             const item = arr[i];
+            //if the item is a string and it is the search query, return the path + index
             if (item==search){
                 return current_path+'['+i+']'
             }
+            //if the item is an array
             if(Array.isArray(item)){
                 for (let j = 0; j < item.length; j++) {
+                    //recusive function with a new path and arr
                     const isItThereReturnPath=checkInArray({arr:item, search, 
                         current_path:current_path+'['+i+']'+'['+j+']'})
-
+                    //stop flow and return path if return value is not null
                     if(isItThereReturnPath) return isItThereReturnPath
                 }
             }   
+            //if the item is an object
             if(typeof item === 'object' && item !== null && !Array.isArray(item)){
+                //recusive function with a new path and obj
                 const isItThereReturnPath=checkInObj({obj:item, search,
                     current_path: current_path+'['+i+'].'})
+                //stop flow and return path if return value is not null
+    
                 if(isItThereReturnPath) return isItThereReturnPath
             } 
         }
@@ -46,20 +55,28 @@ const searchObj= {
     }
     const checkInObj=({obj, search, current_path})=>{
         console.log('it is obj', {current_path})
+        //loop through the object keys
         for (const key in obj) {
             if (Object.hasOwnProperty.call(obj, key)) {
                 const element = obj[key];
+                //if element is not an object or an array, and it also equals to the search value. Stop the flow and return the path
                 if(element==search){
                     return current_path+ key
                 }
+                // if element (item) is an array                
                 if(Array.isArray(element)){
+                    //recusive function with a new path and arr
                     const isItThereReturnPath= checkInArray({arr:element, search, current_path: current_path+ key})
+                    //stop flow and return path if return value is not null
                     if(isItThereReturnPath){
                         return isItThereReturnPath
                     }
                 }
+                // if element (item) is an object
                 if(typeof element === 'object' && element !== null && !Array.isArray(element)){
+                    //recusive function with a new path and obj
                     const isItThereReturnPath= checkInObj({obj:element, search, current_path: current_path+ key+'.'})
+                    //stop flow and return path if return value is not null
                     if(isItThereReturnPath){
                         return isItThereReturnPath
                     }
@@ -72,18 +89,23 @@ const searchObj= {
     }
 
     const getSearchQueryPath=({arr, inputMsg})=>{
-        // let path_name=varToString(arr)
+        //initiate the variable name path
         let path_name= 'variable'
+        
+        //confirm variable is an object
         if (typeof arr === 'object' && arr !== null && !Array.isArray(arr)){
-            //an object
+            //recursive function for object, returns string path if function returns what is needed
             const isItThereReturnPath= checkInObj({obj:arr, search:inputMsg, current_path:path_name+'.'})
             if(isItThereReturnPath) return setFoundPath(`the word ${inputMsg} is at ${isItThereReturnPath}`)
         }
+
+        //confirm if variable is an array
         if (Array.isArray(arr)){
-            //an array
+            //recursive function for array, returns string path if function returns what is needed
             const isItThereReturnPath= checkInArray({arr, search:inputMsg, current_path:path_name})
             if(isItThereReturnPath) return setFoundPath(`the word ${inputMsg} is at ${isItThereReturnPath}`)
         }
+        //if nothing or null is being returned
         return setErrorObj('Nothing found')
     }
   return (
